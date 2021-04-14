@@ -1,0 +1,55 @@
+/* 1.) Is the students table directly related to the courses 
+table? Why or why not? */
+
+SELECT * FROM students;
+	-- columns: student_no, student_name, age
+SELECT * FROM courses;
+	-- columns: course_no, course_title, credits
+	
+-- Answer: No: no PK/FK relationship between the two tables
+
+/* 2.) Using subqueries only, write a SQL statement that returns 
+the names of those students that are taking the 
+courses Physics and US History. */
+
+
+SELECT student_name 
+FROM students
+WHERE student_no IN 
+	(SELECT student_no 
+	 FROM student_enrollment 
+	 WHERE course_no IN(
+		SELECT 
+		course_no 
+		FROM courses 
+		WHERE course_no IN ('CS180', 'CS220')));
+		
+/* 3.) Using subqueries only, write a query that returns the name of the 
+student that is taking the highest number of courses. */
+
+SELECT student_name 
+FROM students
+WHERE student_no IN 
+(SELECT student_no
+		FROM student_enrollment 
+		GROUP BY student_no
+		ORDER BY COUNT(student_no) DESC
+		LIMIT 1);
+				
+
+/* 4.)Answer TRUE or FALSE for the following statement:
+
+Subqueries can be used in the FROM clause and the 
+WHERE clause but cannot be used in the SELECT Clause. */
+
+-- Answer: False. Subqueries can be used in the FROM, WHERE and Select clauses.
+
+/* 5.) Write a query to find the student that is the oldest. 
+You are not allowed to use LIMIT or the ORDER BY clause to solve this problem. */
+
+SELECT student_name 
+FROM students
+WHERE age IN 
+(SELECT MAX(age) FROM students);
+
+
