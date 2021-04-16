@@ -1,0 +1,79 @@
+/* 1.) Write a query that displays 3 columns. The query should display the 
+fruit and it's total supply along with a category of either 
+LOW, ENOUGH or FULL. Low category means that the total supply of the 
+fruit is less than 20,000. 
+The enough category means that the total supply is between 20,000 and 50,000.
+If the total supply is greater than 50,000 then that fruit falls in the full category. */
+
+SELECT 
+	name,
+	a.total_supply,
+	CASE
+		WHEN a.total_supply < 20000 THEN 'LOW'
+		WHEN a.total_supply BETWEEN 20000 AND 50000 THEN 'ENOUGH'
+		ELSE 'FULL'
+	END AS category
+FROM 
+	(SELECT name, SUM(supply) AS total_supply FROM fruit_imports
+	GROUP BY name) AS a
+
+
+
+/* 2.) Taking into consideration the supply column and the cost_per_unit column, 
+you should be able to tabulate the total cost to import fruits by each season. 
+The result will look something like this:
+
+"Winter" "10072.50"
+"Summer" "19623.00"
+"All Year" "22688.00"
+"Spring" "29930.00"
+"Fall" "29035.00"
+
+Write a query that would transpose this data so that the seasons become 
+columns and the total cost for each season fills the first row. */
+
+SELECT 
+
+(SELECT 
+	(CASE WHEN season = 'Winter' THEN 
+		 (SELECT SUM(supply * cost_per_unit)
+		  FROM fruit_imports
+		  WHERE season = 'Winter') ELSE 0 END) AS "Winter"
+FROM fruit_imports
+ORDER BY "Winter" DESC LIMIT 1),
+
+(SELECT 
+	(CASE WHEN season = 'Summer' THEN 
+		 (SELECT SUM(supply * cost_per_unit)
+		  FROM fruit_imports
+		  WHERE season = 'Summer') ELSE 0 END) AS "Summer"
+FROM fruit_imports
+ORDER BY "Summer" DESC LIMIT 1),
+
+(SELECT 
+	(CASE WHEN season = 'All Year' THEN 
+		 (SELECT SUM(supply * cost_per_unit)
+		  FROM fruit_imports
+		  WHERE season = 'All Year') ELSE 0 END) AS "All Year"
+FROM fruit_imports
+ORDER BY "All Year" DESC LIMIT 1),
+
+(SELECT 
+	(CASE WHEN season = 'Spring' THEN 
+		 (SELECT SUM(supply * cost_per_unit)
+		  FROM fruit_imports
+		  WHERE season = 'Spring') ELSE 0 END) AS "Spring"
+FROM fruit_imports
+ORDER BY "Spring" DESC LIMIT 1),
+
+(SELECT 
+	(CASE WHEN season = 'Fall' THEN 
+		 (SELECT SUM(supply * cost_per_unit)
+		  FROM fruit_imports
+		  WHERE season = 'Fall') ELSE 0 END) AS "Fall"
+FROM fruit_imports
+ORDER BY "Fall" DESC LIMIT 1)
+
+
+FROM fruit_imports
+LIMIT 1
