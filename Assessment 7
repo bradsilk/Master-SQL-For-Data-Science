@@ -1,0 +1,78 @@
+/* 1.) Are the tables student_enrollment and professors directly 
+related to each other? Why or why not? */
+
+SELECT * FROM student_enrollment;
+SELECT * FROM professors;
+
+-- A: No. No PK-FK relationship between the two tables.
+
+/* 2.) Write a query that shows the student's name, id, 
+the courses the student is taking and the professors 
+that teaches that course. */
+
+
+SELECT students.student_no, student_name, course_title, last_name
+FROM students
+JOIN 
+student_enrollment ON students.student_no = student_enrollment.student_no
+JOIN 
+courses ON student_enrollment.course_no = courses.course_no
+JOIN
+teach ON courses.course_no = teach.course_no
+ORDER BY student_name;
+
+/* 3.) If you execute the query from the previous answer, 
+you'll notice the student_name and the course_no is being repeated. 
+Why is this happening? */
+
+/* A: Multiple professors can teach the same course. For some students, we see a course
+listed more than once, once for each professor that teaches that same course */
+
+
+
+/* 4.) In question 3 you discovered why there is repeating data. 
+How can we eliminate this redundancy? Let's say we only care to see a single professor 
+teaching a course and we don't care for all the other professors that teach the particular
+course. Write a query that will accomplish this so that every record is distinct. */
+
+SELECT student_no, student_name, course_title, MIN(last_name)
+FROM (
+SELECT students.student_no, student_name, course_title, last_name
+FROM students
+JOIN 
+student_enrollment ON students.student_no = student_enrollment.student_no
+JOIN 
+courses ON student_enrollment.course_no = courses.course_no
+JOIN
+teach ON courses.course_no = teach.course_no
+ORDER BY student_name) AS a
+GROUP BY student_no, student_name, course_title
+ORDER BY student_no;
+
+/* 5.) Why are correlated subqueries slower that non-correlated subqueries and joins? */
+
+--A: Because they have to run for every value of the outer query.
+
+
+
+/* 6.) In the video lectures, we've been discussing the employees table and the departments table. 
+Considering those tables, write a query that returns employees whose salary is above average for 
+their given department. */
+
+SELECT first_name, salary
+FROM employees e1
+WHERE salary > (SELECT AVG(salary) FROM employees e2 WHERE e1.department = e2.department)
+
+
+/* 7.) Write a query that returns ALL of the students as well as any courses 
+they may or may not be taking. */
+
+SELECT students.student_no, student_name, course_no
+FROM students
+JOIN student_enrollment ON students.student_no = student_enrollment.student_no
+
+
+
+
+
+
