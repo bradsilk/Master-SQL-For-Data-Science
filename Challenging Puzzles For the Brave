@@ -1,0 +1,82 @@
+SELECT * FROM students
+/* 1.) Write a query that finds students who do not take CS180. */
+
+SELECT 
+	student_no,
+	student_name
+FROM students
+WHERE student_no NOT IN 
+	  (SELECT student_no
+	  FROM student_enrollment
+	  WHERE course_no = 'CS180')
+ORDER BY student_no;
+
+/* 2.) Write a query to find students who take CS110 or CS107 but not both. */
+
+SELECT 
+	student_no, 
+	student_name
+FROM students
+WHERE student_no IN (
+	
+SELECT student_no
+FROM student_enrollment
+WHERE course_no IN ('CS110', 'CS107')
+AND student_no NOT IN (
+
+SELECT student_no FROM student_enrollment 
+WHERE student_no IN 
+			(SELECT student_no
+			FROM student_enrollment 
+			WHERE course_no = 'CS110')
+AND student_no IN 
+			(SELECT student_no
+			FROM student_enrollment 
+			WHERE course_no = 'CS107') ) )
+			
+/* 3.) Write a query to find students who take CS220 and no other courses. */
+
+SELECT students.student_no, students.student_name
+FROM ((
+	SELECT student_no 
+	FROM student_enrollment 
+	WHERE course_no = 'CS220')
+EXCEPT
+(SELECT student_no
+FROM student_enrollment
+WHERE student_no IN (
+	SELECT student_no 
+	FROM student_enrollment 
+	WHERE course_no IN (
+		SELECT course_no FROM courses
+		WHERE course_no != 'CS220')))) AS a
+JOIN students 
+ON a.student_no = students.student_no
+
+/* 4.) Write a query that finds those students who take at most 2 courses. 
+Your query should exclude students that don't take any courses as well 
+as those that take more than 2 course. */
+
+SELECT 
+	student_no,
+	student_name
+FROM students
+WHERE student_no IN (
+
+SELECT student_no FROM student_enrollment
+GROUP BY student_no
+HAVING COUNT(course_no) BETWEEN 1 AND 2
+ORDER BY student_no)
+
+5.) /* Write a query to find students 
+who are older than at most two other students. */
+
+SELECT student_no, student_name, age
+FROM students
+WHERE age IN (
+SELECT
+	age
+FROM students s1
+WHERE 2 >= (SELECT COUNT(age)
+		   FROM students s2
+		   WHERE s1.age > s2.age))
